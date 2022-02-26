@@ -1,8 +1,9 @@
+const asyncHandler = require("express-async-handler");
 const generateToken = require("../config/generateToken");
 const User = require("../models/userModel");
 
 // /api/user/register
-const registerUser = async (req, res) => {
+const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password, avatar } = req.body;
 
   if (!name || !email || !password) {
@@ -40,10 +41,10 @@ const registerUser = async (req, res) => {
       .status(400)
       .json({ error: true, reason: "Failed to Create the User" });
   }
-};
+});
 
 // /api/user/login
-const authUser = async (req, res) => {
+const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -70,10 +71,10 @@ const authUser = async (req, res) => {
       .status(401)
       .json({ error: true, reason: "Invalid Email or Password" });
   }
-};
+});
 
 // /api/user?search=pardeep
-const allUsers = async (req, res) => {
+const allUsers = asyncHandler(async (req, res) => {
   const keyword = req.query.search
     ? {
         $or: [
@@ -90,6 +91,6 @@ const allUsers = async (req, res) => {
   return res
     .status(200)
     .json({ error: false, users: users?.length ? users : [] });
-};
+});
 
 module.exports = { registerUser, authUser, allUsers };

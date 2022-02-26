@@ -6,6 +6,7 @@ const PORT = process.env.PORT || 5000;
 
 const connectDB = require("./config/db");
 const userRoutes = require("./routes/userRoutes");
+const chatRoutes = require("./routes/chatRoutes");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
 dotenv.config();
@@ -21,15 +22,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/user", userRoutes);
-
-app.get("/api/chat", (req, res) => {
-  res.send("chat");
-});
-
-app.get("/api/chat/:id", (req, res) => {
-  console.log(req.params.id);
-  res.send("single chat");
-});
+app.use("/api/chat", chatRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
