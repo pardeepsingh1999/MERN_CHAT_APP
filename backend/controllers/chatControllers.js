@@ -84,7 +84,13 @@ const createGroupChat = asyncHandler(async (req, res) => {
       .status(400)
       .json({ error: true, reason: "Please fill all the fields" });
 
-  let users = JSON.parse(req.body.users);
+  let users = [];
+
+  try {
+    users = JSON.parse(req.body.users);
+  } catch (error) {
+    users = req.body.users;
+  }
 
   if (users.length < 2)
     return res
@@ -117,4 +123,42 @@ const createGroupChat = asyncHandler(async (req, res) => {
   }
 });
 
-module.exports = { accessChat, fetchChat, createGroupChat };
+const renameGroup = asyncHandler(async (req, res) => {
+  const { chatId, chatName } = req.body;
+
+  if (!chatId) {
+    return res.status(400).json({
+      error: true,
+      reason: "Chat Id is missing",
+    });
+  }
+
+  if (!chatName) {
+    return res.status(400).json({
+      error: true,
+      reason: "Chat name is required",
+    });
+  }
+
+  const updatedChat = await Chat.findByIdAndUpdate(
+    chatId,
+    { chatName },
+    { new: true }
+  )
+    .populate("users", "-password")
+    .populate("groupAdmin", "-password");
+
+  if (updatedChat) {
+    return res.status(200).json({
+      error: false,
+      chat: updatedChat,
+    });
+  } else {
+    return res.status(404).json({
+      error: true,
+      reason: "Chat not found",
+    });
+  }
+});
+
+module.exports = { accessChat, fetchChat, createGroupChat, renameGroup };
