@@ -1,6 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const colors = require("colors");
+var cors = require("cors");
 
 const PORT = process.env.PORT || 5000;
 
@@ -15,6 +16,7 @@ connectDB();
 
 const app = express();
 
+app.use(cors()); // cors
 app.use(express.json()); // to accept json data
 
 app.get("/", (req, res) => {

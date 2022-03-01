@@ -10,6 +10,7 @@ import {
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { showToast } from "../../helpers";
+import { login } from "../../http/http-calls";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -29,16 +30,12 @@ const Login = () => {
     try {
       setLoading(true);
 
-      const config = {
-        method: "post",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
+      const payload = {
+        email,
+        password,
       };
 
-      fetch("/api/user/login", config)
-        .then((res) => res.json())
+      login(payload)
         .then((res) => {
           showToast("Login successfully", "success");
 

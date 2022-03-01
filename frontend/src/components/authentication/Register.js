@@ -9,7 +9,9 @@ import {
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { cloudBucketName, cloudName } from "../../config";
 import { showToast } from "../../helpers";
+import { registration, uploadFileOnCloudnary } from "../../http/http-calls";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -31,16 +33,13 @@ const Register = () => {
 
     if (file.type === "image/jpeg" || file.type === "image/png") {
       const data = new FormData();
-      const cloudName = "dlwhuhzzp";
+
       data.append("file", file);
-      data.append("upload_preset", "MERN_CHAT_APP");
-      data.append("folder", "MERN_CHAT_APP");
+      data.append("upload_preset", cloudBucketName);
+      data.append("folder", cloudBucketName);
       data.append("cloud_name", cloudName);
-      fetch(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, {
-        method: "post",
-        body: data,
-      })
-        .then((res) => res.json())
+
+      uploadFileOnCloudnary(data)
         .then((res) => {
           setAvatar(res.url.toString());
           setLoading(false);
@@ -65,16 +64,14 @@ const Register = () => {
     try {
       setLoading(true);
 
-      const config = {
-        method: "post",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify({ name, email, password, avatar }),
+      const payload = {
+        name,
+        email,
+        password,
+        avatar,
       };
 
-      fetch("/api/user/register", config)
-        .then((res) => res.json())
+      registration(payload)
         .then((res) => {
           showToast("Registered successfully", "success");
 

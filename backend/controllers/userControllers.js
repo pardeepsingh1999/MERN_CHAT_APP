@@ -15,7 +15,9 @@ const registerUser = asyncHandler(async (req, res) => {
   const userExists = await User.findOne({ email });
 
   if (userExists) {
-    return res.status(400).json({ error: true, reason: "User already exists" });
+    return res
+      .status(400)
+      .json({ error: true, reason: "User email already exists" });
   }
 
   const user = await User.create({
@@ -68,7 +70,7 @@ const authUser = asyncHandler(async (req, res) => {
     });
   } else {
     return res
-      .status(401)
+      .status(400)
       .json({ error: true, reason: "Invalid Email or Password" });
   }
 });
