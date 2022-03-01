@@ -161,7 +161,7 @@ const renameGroup = asyncHandler(async (req, res) => {
   }
 });
 
-export const addToGroup = asyncHandler(async (req, res) => {
+const addToGroup = asyncHandler(async (req, res) => {
   const { chatId, userId } = req.body;
 
   if (!chatId) {
@@ -201,7 +201,7 @@ export const addToGroup = asyncHandler(async (req, res) => {
   }
 });
 
-export const removeFromGroup = asyncHandler(async (req, res) => {
+const removeFromGroup = asyncHandler(async (req, res) => {
   const { chatId, userId } = req.body;
 
   if (!chatId) {
