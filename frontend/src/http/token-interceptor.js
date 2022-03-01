@@ -1,12 +1,15 @@
+import { store } from "../redux/store";
+
 export const getToken = () => {
   return new Promise((resolve) => {
-    const token = localStorage.getItem("userData");
+    let token = null;
 
-    if (token) {
-      resolve(token);
-      return;
+    const { userCredential } = store.getState();
+
+    if (userCredential?.token) {
+      token = userCredential.token;
     }
 
-    resolve(null);
+    resolve(token);
   });
 };

@@ -102,3 +102,16 @@ export const uploadFileOnCloudnary = (payload) => {
       });
   });
 };
+
+export const getLoggedInUserDetail = () => {
+  return new Promise((resolve, reject) => {
+    makeGetRequest(`${BASE_URL}/user/details`, true)
+      .then((res) => {
+        resolve(res);
+      })
+      .catch((e) => {
+        console.log("API call error>>", e);
+        reject(e);
+      });
+  });
+};

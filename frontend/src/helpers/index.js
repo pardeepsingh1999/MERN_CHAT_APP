@@ -3,14 +3,16 @@ import toast from "react-hot-toast";
 import _deepClone from "clone-deep";
 import moment from "moment";
 
+import { store as REDUX_STORE } from "../redux/store";
 import { BASE_URL, AWS_IMAGE_BUCKET_NAME } from "../config";
 import { getToken } from "../http/token-interceptor";
 import { PostManager } from "../aws/post-manager";
 import { UploadQueueManager } from "../aws/upload-queue-manager";
 import S3BucketUploader from "../aws/s3-bucket-uploader";
+import { clearUserCredential } from "../redux/actions/user-credential";
 
 export const logout = (navigate = null) => {
-  localStorage.removeItem("userData");
+  REDUX_STORE.dispatch(clearUserCredential());
 
   if (navigate) navigate("/login", { replace: true });
   else window.location.reload();

@@ -8,13 +8,17 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { cloudBucketName, cloudName } from "../../config";
 import { showToast } from "../../helpers";
 import { registration, uploadFileOnCloudnary } from "../../http/http-calls";
+import { addUserCredential } from "../../redux/actions/user-credential";
 
 const Register = () => {
   const navigate = useNavigate();
+
+  const dispatch = useDispatch();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -75,7 +79,7 @@ const Register = () => {
         .then((res) => {
           showToast("Registered successfully", "success");
 
-          localStorage.setItem("userData", JSON.stringify(res.user));
+          dispatch(addUserCredential({ token: res.token, user: res.user }));
 
           setLoading(false);
 

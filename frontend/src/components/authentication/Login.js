@@ -9,11 +9,15 @@ import {
 } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import { showToast } from "../../helpers";
 import { login } from "../../http/http-calls";
+import { addUserCredential } from "../../redux/actions/user-credential";
 
 const Login = () => {
   const navigate = useNavigate();
+
+  const dispatch = useDispatch();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,7 +43,7 @@ const Login = () => {
         .then((res) => {
           showToast("Login successfully", "success");
 
-          localStorage.setItem("userData", JSON.stringify(res.user));
+          dispatch(addUserCredential({ token: res.token, user: res.user }));
 
           setLoading(false);
 

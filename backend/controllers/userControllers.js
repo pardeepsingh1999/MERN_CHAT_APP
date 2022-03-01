@@ -30,12 +30,12 @@ const registerUser = asyncHandler(async (req, res) => {
   if (user) {
     return res.status(201).json({
       error: false,
+      token: generateToken(user._id),
       user: {
         _id: user._id,
         name: user.name,
         email: user.email,
         avatar: user.avatar,
-        token: generateToken(user._id),
       },
     });
   } else {
@@ -60,12 +60,12 @@ const authUser = asyncHandler(async (req, res) => {
   if (user && (await user.matchPassword(password))) {
     return res.status(200).json({
       error: false,
+      token: generateToken(user._id),
       user: {
         _id: user._id,
         name: user.name,
         email: user.email,
         avatar: user.avatar,
-        token: generateToken(user._id),
       },
     });
   } else {
@@ -95,4 +95,14 @@ const allUsers = asyncHandler(async (req, res) => {
     .json({ error: false, users: users?.length ? users : [] });
 });
 
-module.exports = { registerUser, authUser, allUsers };
+const getLoggedInUserDetails = asyncHandler(async (req, res) => {
+  const user = await User.findOne({ _id: req.user._id }).select("-password");
+
+  if (user) {
+    return res.status(200).json({ error: false, user: user });
+  } else {
+    return res.status(401).json({ error: true, reason: "Unauthorized" });
+  }
+});
+
+module.exports = { registerUser, authUser, allUsers, getLoggedInUserDetails };

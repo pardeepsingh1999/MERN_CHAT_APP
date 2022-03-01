@@ -1,7 +1,9 @@
-import { getToken } from "../http/token-interceptor";
+import { store } from "../redux/store";
 
-export const isUserAuthenticated = async () => {
-  const authToken = await getToken();
+export const isUserAuthenticated = () => {
+  const state = store.getState();
 
-  return authToken ? authToken : null;
+  if (state?.userCredential?.token) return true;
+
+  return false;
 };
