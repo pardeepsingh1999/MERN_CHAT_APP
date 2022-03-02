@@ -115,3 +115,16 @@ export const getLoggedInUserDetail = () => {
       });
   });
 };
+
+export const getAllUsers = (params) => {
+  return new Promise((resolve, reject) => {
+    makeGetRequest(`${BASE_URL}/user`, true, params)
+      .then((res) => {
+        resolve(res);
+      })
+      .catch((e) => {
+        console.log("API call error>>", e);
+        reject(e);
+      });
+  });
+};

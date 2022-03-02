@@ -21,7 +21,8 @@ export const CLOUDINARY_BASE_URL =
     : `https://api.cloudinary.com/v1_1/${cloudName}/upload`;
 
 export const DEFAULT_PROFILE_PICTURE =
-  require("../assets/images/default_user_icon.svg").default;
+  // require("../assets/images/default_user_icon.svg").default;
+  "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg";
 
 export const AWS_IMAGE_BUCKET_NAME =
   process.env.REACT_APP_BACKEND_ENV === "live" ? "" : "MERN_CHAT_APP";
