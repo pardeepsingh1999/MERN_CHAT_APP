@@ -128,3 +128,29 @@ export const getAllUsers = (params) => {
       });
   });
 };
+
+export const accessChat = (payload) => {
+  return new Promise((resolve, reject) => {
+    makePostRequest(`${BASE_URL}/chat`, true, payload)
+      .then((res) => {
+        resolve(res);
+      })
+      .catch((e) => {
+        console.log("API call error>>", e);
+        reject(e);
+      });
+  });
+};
+
+export const fetchChats = () => {
+  return new Promise((resolve, reject) => {
+    makeGetRequest(`${BASE_URL}/chat`, true)
+      .then((res) => {
+        resolve(res);
+      })
+      .catch((e) => {
+        console.log("API call error>>", e);
+        reject(e);
+      });
+  });
+};

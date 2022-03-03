@@ -14,6 +14,8 @@ const ChatLoadingComponent = () => {
       <Skeleton height="45px" />
       <Skeleton height="45px" />
       <Skeleton height="45px" />
+      <Skeleton height="45px" />
+      <Skeleton height="45px" />
     </Stack>
   );
 };

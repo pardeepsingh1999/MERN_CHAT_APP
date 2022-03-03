@@ -13,6 +13,7 @@ import {
   MenuDivider,
   MenuItem,
   MenuList,
+  Spinner,
   Text,
   Tooltip,
 } from "@chakra-ui/react";
@@ -23,7 +24,7 @@ import { useNavigate } from "react-router-dom";
 import { DEFAULT_PROFILE_PICTURE } from "../../config/index";
 import { logout, showToast } from "../../helpers/index";
 import ProfileModal from "./ProfileModal";
-import { getAllUsers } from "../../http/http-calls";
+import { accessChat, getAllUsers } from "../../http/http-calls";
 import ChatLoadingComponent from "./ChatLoadingComponent";
 import UserListItemComponent from "./UserListItemComponent";
 
@@ -35,7 +36,7 @@ const SideDrawerComponent = () => {
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
-  // const [loadingChat, setLoadingChat] = useState(false);
+  const [loadingChat, setLoadingChat] = useState(false);
 
   const [isOpenProfileModal, setIsOpenProfileModal] = useState(false);
 
@@ -76,7 +77,24 @@ const SideDrawerComponent = () => {
   };
 
   const _accessChat = (userId) => {
-    console.log("access chat", userId);
+    setLoadingChat(true);
+
+    accessChat({ userId })
+      .then((res) => {
+        console.log("res>>", res);
+        setLoadingChat(false);
+      })
+      .catch((error) => {
+        console.log("error>>", error);
+        setLoadingChat(false);
+
+        showToast(
+          error?.reason?.length
+            ? error.reason
+            : "Server error, Try again after sometime",
+          "error"
+        );
+      });
   };
 
   return (
@@ -163,6 +181,8 @@ const SideDrawerComponent = () => {
                 />
               ))
             )}
+
+            {loadingChat ? <Spinner ml="auto" d="flex" /> : null}
           </DrawerBody>
         </DrawerContent>
       </Drawer>
