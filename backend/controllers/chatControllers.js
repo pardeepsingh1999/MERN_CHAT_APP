@@ -26,7 +26,7 @@ const accessChat = asyncHandler(async (req, res) => {
   });
 
   if (isChat?.length > 0) {
-    return res.status(200).json({ error: false, chat: isChat });
+    return res.status(200).json({ error: false, chat: isChat[0] });
   } else {
     var chatData = {
       chatName: "sender",
