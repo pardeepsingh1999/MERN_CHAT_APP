@@ -23,10 +23,10 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { DEFAULT_PROFILE_PICTURE } from "../../config/index";
 import { logout, showToast } from "../../helpers/index";
-import ProfileModal from "./ProfileModal";
 import { accessChat, getAllUsers } from "../../http/http-calls";
 import ChatLoadingComponent from "./ChatLoadingComponent";
 import UserListItemComponent from "./UserListItemComponent";
+import ProfileModal from "../modals/ProfileModal";
 
 const SideDrawerComponent = () => {
   const navigate = useNavigate();

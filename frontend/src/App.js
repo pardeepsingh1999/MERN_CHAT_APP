@@ -5,7 +5,7 @@ import HomePage from "./pages/HomePage";
 import { Toaster } from "react-hot-toast";
 import PublicRoute from "./components/routes/PublicRoute";
 import ProtectedRoute from "./components/routes/ProtectedRoute";
-import FullPageLoader from "./components/FullPageLoader";
+import FullPageLoader from "./components/miscellaneous/FullPageLoader";
 
 function App() {
   return (

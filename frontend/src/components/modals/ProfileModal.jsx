@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Modal,
   ModalOverlay,
@@ -10,7 +11,6 @@ import {
   Image,
   Text,
 } from "@chakra-ui/react";
-import React from "react";
 import { capitalize } from "../../helpers";
 import { DEFAULT_PROFILE_PICTURE } from "../../config/index";
 

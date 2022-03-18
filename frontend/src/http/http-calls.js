@@ -154,3 +154,16 @@ export const fetchChats = () => {
       });
   });
 };
+
+export const createGroupChat = (payload) => {
+  return new Promise((resolve, reject) => {
+    makePostRequest(`${BASE_URL}/chat/group`, true, payload)
+      .then((res) => {
+        resolve(res);
+      })
+      .catch((e) => {
+        console.log("API call error>>", e);
+        reject(e);
+      });
+  });
+};
