@@ -1,7 +1,7 @@
 import {
   makeGetRequest,
   makePostRequest,
-  // makePutRequest,
+  makePutRequest,
   // makeDeleteRequest,
   uploadFileMultiPart,
 } from "./http-service";
@@ -158,6 +158,45 @@ export const fetchChats = () => {
 export const createGroupChat = (payload) => {
   return new Promise((resolve, reject) => {
     makePostRequest(`${BASE_URL}/chat/group`, true, payload)
+      .then((res) => {
+        resolve(res);
+      })
+      .catch((e) => {
+        console.log("API call error>>", e);
+        reject(e);
+      });
+  });
+};
+
+export const renameGroup = (payload) => {
+  return new Promise((resolve, reject) => {
+    makePutRequest(`${BASE_URL}/chat/rename`, true, payload)
+      .then((res) => {
+        resolve(res);
+      })
+      .catch((e) => {
+        console.log("API call error>>", e);
+        reject(e);
+      });
+  });
+};
+
+export const addToGroup = (payload) => {
+  return new Promise((resolve, reject) => {
+    makePutRequest(`${BASE_URL}/chat/groupadd`, true, payload)
+      .then((res) => {
+        resolve(res);
+      })
+      .catch((e) => {
+        console.log("API call error>>", e);
+        reject(e);
+      });
+  });
+};
+
+export const removeFromGroup = (payload) => {
+  return new Promise((resolve, reject) => {
+    makePutRequest(`${BASE_URL}/chat/groupremove`, true, payload)
       .then((res) => {
         resolve(res);
       })

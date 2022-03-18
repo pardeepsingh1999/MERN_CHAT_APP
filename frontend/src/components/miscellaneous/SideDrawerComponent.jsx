@@ -28,7 +28,7 @@ import ChatLoadingComponent from "./ChatLoadingComponent";
 import UserListItemComponent from "./UserListItemComponent";
 import ProfileModal from "../modals/ProfileModal";
 
-const SideDrawerComponent = () => {
+const SideDrawerComponent = ({ handleSelectChat }) => {
   const navigate = useNavigate();
 
   const userCredential = useSelector((state) => state?.userCredential);
@@ -81,8 +81,9 @@ const SideDrawerComponent = () => {
 
     accessChat({ userId })
       .then((res) => {
-        console.log("res>>", res);
+        if (res?.chat) handleSelectChat(res.chat);
         setLoadingChat(false);
+        _toggleDrawer();
       })
       .catch((error) => {
         console.log("error>>", error);
@@ -155,7 +156,9 @@ const SideDrawerComponent = () => {
         <DrawerOverlay />
 
         <DrawerContent>
-          <DrawerHeader borderBottomWidth="1px">Search Users</DrawerHeader>
+          <DrawerHeader borderBottomWidth="1px">
+            Search Users {loadingChat ? <Spinner ml="1" size="sm" /> : null}
+          </DrawerHeader>
 
           <DrawerBody>
             <Box d="flex" pb="2">
@@ -181,8 +184,6 @@ const SideDrawerComponent = () => {
                 />
               ))
             )}
-
-            {loadingChat ? <Spinner ml="auto" d="flex" /> : null}
           </DrawerBody>
         </DrawerContent>
       </Drawer>

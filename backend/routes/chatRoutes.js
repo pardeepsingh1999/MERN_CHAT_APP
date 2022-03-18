@@ -13,11 +13,12 @@ const router = express.Router();
 
 router.use("*", protect);
 
-router.route("/").get(fetchChat).post(accessChat);
+router.get("/", fetchChat);
+router.post("/", accessChat);
 
-router.route("/group").post(createGroupChat);
-router.route("/rename").put(renameGroup);
-router.route("/groupadd").put(addToGroup);
-router.route("/groupremove").put(removeFromGroup);
+router.post("/group", createGroupChat);
+router.put("/rename", renameGroup);
+router.put("/groupadd", addToGroup);
+router.put("/groupremove", removeFromGroup);
 
 module.exports = router;

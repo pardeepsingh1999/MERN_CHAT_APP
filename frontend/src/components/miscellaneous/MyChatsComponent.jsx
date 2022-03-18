@@ -1,57 +1,24 @@
 import { AddIcon } from "@chakra-ui/icons";
 import { Box, Button, Spinner, Stack, Text } from "@chakra-ui/react";
-import React, { useEffect } from "react";
+import React from "react";
 import { useState } from "react";
-import { useSelector } from "react-redux";
-import { showToast } from "../../helpers";
-import { fetchChats } from "../../http/http-calls";
+import { capitalizeEveryFirstLetter } from "../../helpers";
+import { getSenderName } from "../../helpers/chat-helpers";
 import GroupChatModal from "../modals/GroupChatModal";
 import ChatLoadingComponent from "./ChatLoadingComponent";
 
-const MyChatsComponent = () => {
-  const userCredential = useSelector((state) => state?.userCredential);
-
-  const [selectedChat, setSelectedChat] = useState(null);
+const MyChatsComponent = ({
+  selectedChat,
+  handleSelectChat,
+  threadLoading,
+  chats,
+  fetchChats,
+}) => {
   const [isOpenGroupChatModal, setIsOpenGroupChatModal] = useState(false);
-  const [chats, setChats] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  const _fetchChats = () => {
-    setLoading(true);
-
-    fetchChats()
-      .then((res) => {
-        setChats(res?.chats?.length ? res.chats : []);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.log("error>>", error);
-        setLoading(false);
-        showToast(
-          error?.reason?.length
-            ? error.reason
-            : "Server error, Try again after sometime",
-          "error"
-        );
-      });
-  };
-
-  const _getSenderName = (chatUsers) => {
-    if (chatUsers?.length && userCredential?.user?._id) {
-      return chatUsers[0]._id === userCredential.user._id
-        ? chatUsers[1].name
-        : chatUsers[0].name;
-    }
-    return "N/A";
-  };
 
   const _toggleGroupChatModal = (isOpen = false) => {
     setIsOpenGroupChatModal(isOpen);
   };
-
-  useEffect(() => {
-    _fetchChats();
-  }, []);
 
   return (
     <>
@@ -75,7 +42,7 @@ const MyChatsComponent = () => {
           justifyContent="space-between"
           alignItems="center"
         >
-          My Chats {loading ? <Spinner size="sm" /> : null}
+          My Chats {threadLoading ? <Spinner size="sm" /> : null}
           <Button
             d="flex"
             fontSize={{ base: "16px", md: "10px", lg: "16px" }}
@@ -100,10 +67,18 @@ const MyChatsComponent = () => {
             <Stack overflowY="scroll">
               {chats.map((chat) => (
                 <Box
-                  onClick={() => setSelectedChat(chat)}
+                  onClick={() => handleSelectChat(chat)}
                   cursor="pointer"
-                  bg={selectedChat === chat ? "#38B2AC" : "#E8E8E8"}
-                  color={selectedChat === chat ? "white" : "black"}
+                  bg={
+                    selectedChat?._id && selectedChat._id === chat._id
+                      ? "#38B2AC"
+                      : "#E8E8E8"
+                  }
+                  color={
+                    selectedChat?._id && selectedChat._id === chat._id
+                      ? "white"
+                      : "black"
+                  }
                   px="3"
                   py="3"
                   borderRadius="lg"
@@ -111,11 +86,12 @@ const MyChatsComponent = () => {
                 >
                   <Text>
                     {chat.isGroupChat
-                      ? chat.chatName
-                      : _getSenderName(chat.users)}
+                      ? capitalizeEveryFirstLetter(chat.chatName)
+                      : getSenderName(chat.users)}
                   </Text>
                 </Box>
               ))}
+              s
             </Stack>
           ) : (
             <ChatLoadingComponent />
@@ -126,7 +102,7 @@ const MyChatsComponent = () => {
       <GroupChatModal
         isOpen={isOpenGroupChatModal}
         toggle={() => _toggleGroupChatModal()}
-        fetchChats={() => _fetchChats()}
+        fetchChats={() => fetchChats()}
       />
     </>
   );
