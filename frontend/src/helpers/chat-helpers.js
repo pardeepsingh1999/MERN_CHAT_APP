@@ -22,3 +22,44 @@ export const getSenderDetails = (chatUsers) => {
   }
   return "N/A";
 };
+
+export const isMyMessage = (message) => {
+  const state = REDUX_STORE.getState();
+
+  if (
+    message?.sender?._id &&
+    state?.userCredential?.user?._id &&
+    message?.sender?._id === state?.userCredential?.user?._id
+  )
+    return true;
+
+  return false;
+};
+
+export const isOtherMessage = (message) => {
+  const state = REDUX_STORE.getState();
+
+  if (
+    message?.sender?._id &&
+    state?.userCredential?.user?._id &&
+    message?.sender?._id !== state?.userCredential?.user?._id
+  )
+    return true;
+
+  return false;
+};
+
+export const isSameSender = (messages, message, index) => {
+  const state = REDUX_STORE.getState();
+
+  if (
+    message?.sender?._id &&
+    state?.userCredential?.user?._id &&
+    message?.sender?._id !== state?.userCredential?.user?._id &&
+    messages[index + 1] &&
+    messages[index + 1].sender?._id === state?.userCredential?.user?._id
+  )
+    return true;
+
+  return false;
+};

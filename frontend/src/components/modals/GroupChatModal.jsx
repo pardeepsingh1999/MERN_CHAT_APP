@@ -28,7 +28,13 @@ import { useSelector } from "react-redux";
 
 let searchUserTimer;
 
-const GroupChatModal = ({ isOpen, data, toggle, fetchChats }) => {
+const GroupChatModal = ({
+  isOpen,
+  data,
+  toggle,
+  fetchChats,
+  getAllMessages,
+}) => {
   const [groupChatName, setGroupChatName] = useState("");
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [search, setSearch] = useState("");
@@ -254,6 +260,8 @@ const GroupChatModal = ({ isOpen, data, toggle, fetchChats }) => {
       removeFromGroup(payload)
         .then((res) => {
           fetchChats();
+          getAllMessages();
+
           if (userCredential?.user?._id === user?._id) {
             showToast("You left the group", "success");
             _onClose();

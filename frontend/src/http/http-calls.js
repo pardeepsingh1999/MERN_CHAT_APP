@@ -206,3 +206,29 @@ export const removeFromGroup = (payload) => {
       });
   });
 };
+
+export const sendMessage = (payload) => {
+  return new Promise((resolve, reject) => {
+    makePostRequest(`${BASE_URL}/message`, true, payload)
+      .then((res) => {
+        resolve(res);
+      })
+      .catch((e) => {
+        console.log("API call error>>", e);
+        reject(e);
+      });
+  });
+};
+
+export const getAllMessages = (chatId) => {
+  return new Promise((resolve, reject) => {
+    makeGetRequest(`${BASE_URL}/message/${chatId}`, true)
+      .then((res) => {
+        resolve(res);
+      })
+      .catch((e) => {
+        console.log("API call error>>", e);
+        reject(e);
+      });
+  });
+};

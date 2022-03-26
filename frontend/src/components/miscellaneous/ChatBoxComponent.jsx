@@ -1,10 +1,20 @@
 import { ArrowBackIcon, ViewIcon } from "@chakra-ui/icons";
-import { Box, IconButton, Text } from "@chakra-ui/react";
-import React, { useState } from "react";
-import { capitalizeEveryFirstLetter } from "../../helpers";
+import {
+  Box,
+  FormControl,
+  IconButton,
+  Input,
+  Spinner,
+  Text,
+} from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
+import { capitalizeEveryFirstLetter, showToast } from "../../helpers";
 import { getSenderDetails, getSenderName } from "../../helpers/chat-helpers";
+import { getAllMessages, sendMessage } from "../../http/http-calls";
 import GroupChatModal from "../modals/GroupChatModal";
 import ProfileModal from "../modals/ProfileModal";
+import "../../assets/styles/index.css";
+import ScrollableChat from "./ScrollableChat";
 
 const ChatBoxComponent = ({ selectedChat, handleSelectChat, fetchChats }) => {
   const [profileModal, setProfileModal] = useState({
@@ -15,6 +25,10 @@ const ChatBoxComponent = ({ selectedChat, handleSelectChat, fetchChats }) => {
     isOpen: false,
   });
 
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [newMessage, setNewMessage] = useState("");
+
   const _toggleProfileModal = (isOpen = false, data = null) => {
     setProfileModal({ isOpen, data });
   };
@@ -22,6 +36,63 @@ const ChatBoxComponent = ({ selectedChat, handleSelectChat, fetchChats }) => {
   const _toggleGroupChatModal = (isOpen = false) => {
     setGroupChatModal({ isOpen });
   };
+
+  const _getAllMessages = (chatId) => {
+    setLoading(true);
+
+    getAllMessages(chatId)
+      .then((res) => {
+        setMessages(res?.messages?.length ? res.messages : []);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.log("error>>", error);
+        setLoading(false);
+
+        showToast(
+          error?.reason?.length
+            ? error.reason
+            : "Server error, Try again after sometime",
+          "error"
+        );
+      });
+  };
+
+  const _sendMessage = (event) => {
+    if (event.key === "Enter" && newMessage?.trim()) {
+      try {
+        const payload = {
+          content: newMessage.trim(),
+          chatId: selectedChat?._id,
+        };
+
+        setNewMessage("");
+
+        sendMessage(payload)
+          .then((res) => {
+            setMessages([...messages, res.message]);
+          })
+          .catch((error) => {
+            console.log("error>>", error);
+
+            showToast(
+              error?.reason?.length
+                ? error.reason
+                : "Server error, Try again after sometime",
+              "error"
+            );
+          });
+      } catch (error) {}
+    }
+  };
+
+  const _typingHandler = (value) => {
+    setNewMessage(value);
+  };
+
+  useEffect(() => {
+    if (selectedChat?._id) _getAllMessages(selectedChat?._id);
+  }, [selectedChat?._id]);
 
   return (
     <>
@@ -87,7 +158,29 @@ const ChatBoxComponent = ({ selectedChat, handleSelectChat, fetchChats }) => {
               borderRadius="lg"
               overflowY="hidden"
             >
-              {/* messages here */}
+              {loading ? (
+                <Spinner
+                  size="xl"
+                  w="20"
+                  h="20"
+                  alignSelf="center"
+                  margin="auto"
+                />
+              ) : (
+                <div className="messages">
+                  <ScrollableChat messages={messages} />
+                </div>
+              )}
+
+              <FormControl onKeyDown={(e) => _sendMessage(e)} isRequired mt="3">
+                <Input
+                  variant="filled"
+                  bg="#E0E0E0"
+                  placeholder="Type message..."
+                  onChange={(e) => _typingHandler(e.target.value)}
+                  value={newMessage}
+                />
+              </FormControl>
             </Box>
           </>
         ) : (
@@ -110,6 +203,7 @@ const ChatBoxComponent = ({ selectedChat, handleSelectChat, fetchChats }) => {
         data={selectedChat?.isGroupChat ? selectedChat : null}
         toggle={() => _toggleGroupChatModal()}
         fetchChats={() => fetchChats()}
+        getAllMessages={() => getAllMessages()}
       />
     </>
   );
