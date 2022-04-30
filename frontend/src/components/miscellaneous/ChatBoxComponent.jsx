@@ -15,8 +15,25 @@ import GroupChatModal from "../modals/GroupChatModal";
 import ProfileModal from "../modals/ProfileModal";
 import "../../assets/styles/index.css";
 import ScrollableChat from "./ScrollableChat";
+import {
+  connectToSocket,
+  disconnectToSocket,
+  newSocket,
+} from "../../socket-io";
+import { useSelector } from "react-redux";
+import Lottie from "react-lottie";
+import typingLoadingAnimationData from "../../assets/animations/typing_loading.json";
 
 const ChatBoxComponent = ({ selectedChat, handleSelectChat, fetchChats }) => {
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: typingLoadingAnimationData,
+    redererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
+
   const [profileModal, setProfileModal] = useState({
     isOpen: false,
     data: null,
@@ -25,9 +42,13 @@ const ChatBoxComponent = ({ selectedChat, handleSelectChat, fetchChats }) => {
     isOpen: false,
   });
 
+  const userCredential = useSelector((store) => store["userCredential"]);
+
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
+  const [typing, setTyping] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
 
   const _toggleProfileModal = (isOpen = false, data = null) => {
     setProfileModal({ isOpen, data });
@@ -44,6 +65,47 @@ const ChatBoxComponent = ({ selectedChat, handleSelectChat, fetchChats }) => {
       .then((res) => {
         setMessages(res?.messages?.length ? res.messages : []);
         setLoading(false);
+
+        newSocket.emit("joinChat", selectedChat._id, (res) => {
+          if (res.error) {
+            console.log("error>>", res);
+            showToast(
+              res.reason && res.reason.length
+                ? res.reason
+                : "Server error. Try again after sometimes.",
+              "error"
+            );
+            return;
+          }
+
+          newSocket.on("typing", (isTyping = false) => {
+            console.log("isTyping>>", isTyping);
+            setIsTyping(isTyping);
+          });
+        });
+
+        newSocket.on("messageReceived", (newMessageReceived) => {
+          console.log("messageReceived>>", newMessageReceived);
+
+          if (newMessageReceived.error) {
+            console.log("error>>", newMessageReceived);
+            showToast(
+              newMessageReceived?.reason?.length
+                ? newMessageReceived.reason
+                : "Server error. Try again after sometimes.",
+              "error"
+            );
+            return;
+          }
+
+          console.log("selectedChat>>", selectedChat);
+
+          if (newMessageReceived.chat._id === selectedChat._id) {
+            setMessages((prev) => [...prev, newMessageReceived]);
+          } else {
+            // give notification
+          }
+        });
       })
       .catch((error) => {
         console.log("error>>", error);
@@ -71,6 +133,19 @@ const ChatBoxComponent = ({ selectedChat, handleSelectChat, fetchChats }) => {
         sendMessage(payload)
           .then((res) => {
             setMessages([...messages, res.message]);
+
+            newSocket.emit("newMessage", res.message, (res) => {
+              if (res.error) {
+                console.log("error>>", res);
+                showToast(
+                  res.reason && res.reason.length
+                    ? res.reason
+                    : "Server error. Try again after sometimes.",
+                  "error"
+                );
+                return;
+              }
+            });
           })
           .catch((error) => {
             console.log("error>>", error);
@@ -88,11 +163,89 @@ const ChatBoxComponent = ({ selectedChat, handleSelectChat, fetchChats }) => {
 
   const _typingHandler = (value) => {
     setNewMessage(value);
+
+    // typing indicator logic
+    if (!newSocket.connected) return;
+
+    if (!typing) {
+      setTyping(true);
+      newSocket.emit("typing", selectedChat._id, true);
+    }
   };
 
   useEffect(() => {
-    if (selectedChat?._id) _getAllMessages(selectedChat?._id);
+    if (typing) {
+      setTimeout(() => {
+        newSocket.emit("typing", selectedChat._id, false);
+        setTyping(false);
+      }, 4000);
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [typing]);
+
+  const _connectToSocket = () => {
+    connectToSocket()
+      .then((res) => {
+        newSocket.emit("setup", { room: userCredential?.user?._id }, (res) => {
+          if (res.error) {
+            console.log("error>>", res);
+            showToast(
+              res.reason && res.reason.length
+                ? res.reason
+                : "Server error. Try again after sometimes.",
+              "error"
+            );
+            return;
+          }
+        });
+      })
+      .catch((error) => {
+        console.log("error>>", error);
+
+        showToast(
+          error?.reason?.length
+            ? error.reason
+            : "Server error, Try again after sometime",
+          "error"
+        );
+      });
+  };
+
+  const _disconnectToSocket = () => {
+    disconnectToSocket()
+      .then((res) => {
+        console.log("Disconnected");
+      })
+      .catch((error) => {
+        console.log("error>>", error);
+
+        showToast(
+          error?.reason?.length
+            ? error.reason
+            : "Server error, Try again after sometime",
+          "error"
+        );
+      });
+  };
+
+  useEffect(() => {
+    if (selectedChat?._id) {
+      newSocket.removeAllListeners("messageReceived");
+      newSocket.removeAllListeners("typing");
+      _getAllMessages(selectedChat?._id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedChat?._id]);
+
+  useEffect(() => {
+    _connectToSocket();
+
+    return () => {
+      _disconnectToSocket();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
@@ -172,7 +325,21 @@ const ChatBoxComponent = ({ selectedChat, handleSelectChat, fetchChats }) => {
                 </div>
               )}
 
-              <FormControl onKeyDown={(e) => _sendMessage(e)} isRequired mt="3">
+              <FormControl
+                onKeyDown={(e) => _sendMessage(e)}
+                isRequired
+                mt={isTyping ? "0" : "3"}
+              >
+                {isTyping ? (
+                  <div>
+                    <Lottie
+                      options={defaultOptions}
+                      width={70}
+                      // height={50}
+                      style={{ margin: 0 }}
+                    />
+                  </div>
+                ) : null}
                 <Input
                   variant="filled"
                   bg="#E0E0E0"

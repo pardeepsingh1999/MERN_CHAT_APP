@@ -91,7 +91,6 @@ const MyChatsComponent = ({
                   </Text>
                 </Box>
               ))}
-              s
             </Stack>
           ) : (
             <ChatLoadingComponent />

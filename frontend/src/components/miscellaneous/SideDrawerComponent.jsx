@@ -133,7 +133,7 @@ const SideDrawerComponent = ({ handleSelectChat }) => {
               <Avatar
                 size="sm"
                 cursor="pointer"
-                name={userCredential?.user?.name}
+                name={userCredential?.user?.name || "N/A"}
                 src={userCredential?.user?.avatar || DEFAULT_PROFILE_PICTURE}
               />
             </MenuButton>

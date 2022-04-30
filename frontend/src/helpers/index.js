@@ -114,7 +114,30 @@ export const extractQueryParams = () => {
   return params;
 };
 
+export const generateNotificationCalenderDate = (timeStamp) => {
+  if (!timeStamp) return "";
+
+  let fromNow = moment().isSame(timeStamp, "month") ? "This Month" : "Earlier";
+
+  moment.updateLocale("en", {
+    calendar: {
+      sameDay: "[Today]",
+      lastDay: "[Yesterday]",
+      lastWeek: "[This Week]",
+      nextDay: "[Tomorrow]",
+      nextWeek: "D MMMM YYYY",
+      sameElse: function () {
+        return "[" + fromNow + "]";
+      },
+    },
+  });
+
+  return moment(new Date(timeStamp)).calendar();
+};
+
 export const generateCalenderDate = (timeStamp) => {
+  if (!timeStamp) return "";
+
   moment.updateLocale("en", {
     calendar: {
       lastDay: "[Yesterday]",
@@ -137,6 +160,12 @@ export const formatDate = (date) => {
   } else {
     return moment(new Date(date)).format("MMM DD, YYYY");
   }
+};
+
+export const isSameDay = (date1, date2) => {
+  if (!date1 || !date2) return false;
+
+  return moment(date1).isSame(date2, "day");
 };
 
 export const formatDateAndTime = (date) => {
@@ -329,7 +358,7 @@ export const uploadPhotoToCloudinary = (
 // program to get the file extension
 export const getFileExtension = (filename) => {
   // get file extension
-  const extension = filename.split(".").pop();
+  const extension = filename?.split(".").pop();
   return extension;
 };
 

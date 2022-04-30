@@ -1,7 +1,17 @@
 import io from "socket.io-client";
 import { SOCKET_BASE_URL } from "../config";
 
-export const newSocket = io(SOCKET_BASE_URL);
+export const newSocket = io(SOCKET_BASE_URL, {
+  forceNew: true,
+  upgrade: false,
+  jsonp: false,
+  reconnection: true,
+  reconnectionDelay: 100,
+  reconnectionAttempts: 100000,
+  transports: ["websocket"],
+});
+
+var intervalID;
 
 export const connectToSocket = () => {
   return new Promise((resolve, reject) => {
@@ -13,7 +23,7 @@ export const connectToSocket = () => {
         }
       };
 
-      var intervalID = setInterval(tryReconnect, 4000);
+      intervalID = setInterval(tryReconnect, 4000);
 
       newSocket.on("connect", function () {
         console.log("connected>>", newSocket.connected); // true
@@ -32,6 +42,8 @@ export const connectToSocket = () => {
 export const disconnectToSocket = () => {
   return new Promise((resolve, reject) => {
     try {
+      clearInterval(intervalID);
+
       newSocket.on("disconnect", () => {
         console.log("connected>>", newSocket.connected); // false
       });

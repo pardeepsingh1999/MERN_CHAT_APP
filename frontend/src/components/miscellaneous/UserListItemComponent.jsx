@@ -26,7 +26,7 @@ const UserListItemComponent = ({ user, accessChat }) => {
         mr="2"
         size="sm"
         cursor="pointer"
-        name={user?.name}
+        name={user?.name || "N/A"}
         src={user?.avatar || DEFAULT_PROFILE_PICTURE}
       />
 
