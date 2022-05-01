@@ -11,6 +11,7 @@ import {
 } from "@chakra-ui/react";
 import Login from "../components/authentication/Login";
 import Register from "../components/authentication/Register";
+import { APP_NAME } from "../config";
 
 const HomePage = () => {
   return (
@@ -27,7 +28,7 @@ const HomePage = () => {
           borderWidth="1px"
         >
           <Text fontSize="4xl" fontFamily="Work sans">
-            Talk-A-Tive
+            {APP_NAME}
           </Text>
         </Box>
         <Box bg="white" w="100%" p={4} borderRadius="lg" borderWidth="1px">

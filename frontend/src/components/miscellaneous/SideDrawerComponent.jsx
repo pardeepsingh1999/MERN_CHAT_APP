@@ -21,7 +21,7 @@ import { BellIcon, ChevronDownIcon, DeleteIcon } from "@chakra-ui/icons";
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { DEFAULT_PROFILE_PICTURE } from "../../config/index";
+import { APP_NAME, DEFAULT_PROFILE_PICTURE } from "../../config/index";
 import { logout, showToast } from "../../helpers/index";
 import { accessChat, getAllUsers } from "../../http/http-calls";
 import ChatLoadingComponent from "./ChatLoadingComponent";
@@ -129,7 +129,7 @@ const SideDrawerComponent = ({ handleSelectChat }) => {
         </Tooltip>
 
         <Text fontSize="2xl" fontFamily="Work sans">
-          Talk-A-Tive
+          {APP_NAME}
         </Text>
 
         <div>
