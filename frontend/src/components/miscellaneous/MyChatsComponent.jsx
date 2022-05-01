@@ -105,8 +105,10 @@ const MyChatsComponent = ({
                 </Box>
               ))}
             </Stack>
-          ) : (
+          ) : threadLoading ? (
             <ChatLoadingComponent />
+          ) : (
+            "No chat available"
           )}
         </Box>
       </Box>
