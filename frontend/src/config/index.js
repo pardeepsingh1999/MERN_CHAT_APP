@@ -1,5 +1,7 @@
 export const BASE_URL =
-  process.env.REACT_APP_BACKEND_ENV === "live" ? "/api" : "/api";
+  process.env.REACT_APP_BACKEND_ENV === "live"
+    ? "/api"
+    : "http://localhost:5000/api";
 
 export const SOCKET_BASE_URL =
   process.env.REACT_APP_BACKEND_ENV === "live"
