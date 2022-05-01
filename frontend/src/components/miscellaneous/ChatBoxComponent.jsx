@@ -20,19 +20,16 @@ import {
   disconnectToSocket,
   newSocket,
 } from "../../socket-io";
-import { useSelector } from "react-redux";
-import Lottie from "react-lottie";
-import typingLoadingAnimationData from "../../assets/animations/typing_loading.json";
+import { useSelector, useDispatch } from "react-redux";
+import { addNotification } from "../../redux/actions/notifications";
 
-const ChatBoxComponent = ({ selectedChat, handleSelectChat, fetchChats }) => {
-  const defaultOptions = {
-    loop: true,
-    autoplay: true,
-    animationData: typingLoadingAnimationData,
-    redererSettings: {
-      preserveAspectRatio: "xMidYMid slice",
-    },
-  };
+const ChatBoxComponent = ({
+  selectedChat,
+  handleSelectChat,
+  fetchChats,
+  updateLatestMessage,
+}) => {
+  const dispatch = useDispatch();
 
   const [profileModal, setProfileModal] = useState({
     isOpen: false,
@@ -85,7 +82,9 @@ const ChatBoxComponent = ({ selectedChat, handleSelectChat, fetchChats }) => {
         });
 
         newSocket.on("messageReceived", (newMessageReceived) => {
-          console.log("messageReceived>>", newMessageReceived);
+          console.log("newMessageReceived>>", newMessageReceived);
+
+          updateLatestMessage(newMessageReceived);
 
           if (newMessageReceived.error) {
             console.log("error>>", newMessageReceived);
@@ -98,12 +97,11 @@ const ChatBoxComponent = ({ selectedChat, handleSelectChat, fetchChats }) => {
             return;
           }
 
-          console.log("selectedChat>>", selectedChat);
-
           if (newMessageReceived.chat._id === selectedChat._id) {
             setMessages((prev) => [...prev, newMessageReceived]);
           } else {
             // give notification
+            dispatch(addNotification(newMessageReceived));
           }
         });
       })
@@ -133,6 +131,8 @@ const ChatBoxComponent = ({ selectedChat, handleSelectChat, fetchChats }) => {
         sendMessage(payload)
           .then((res) => {
             setMessages([...messages, res.message]);
+
+            updateLatestMessage(res.message);
 
             newSocket.emit("newMessage", res.message, (res) => {
               if (res.error) {
@@ -321,25 +321,11 @@ const ChatBoxComponent = ({ selectedChat, handleSelectChat, fetchChats }) => {
                 />
               ) : (
                 <div className="messages">
-                  <ScrollableChat messages={messages} />
+                  <ScrollableChat messages={messages} isTyping={isTyping} />
                 </div>
               )}
 
-              <FormControl
-                onKeyDown={(e) => _sendMessage(e)}
-                isRequired
-                mt={isTyping ? "0" : "3"}
-              >
-                {isTyping ? (
-                  <div>
-                    <Lottie
-                      options={defaultOptions}
-                      width={70}
-                      // height={50}
-                      style={{ margin: 0 }}
-                    />
-                  </div>
-                ) : null}
+              <FormControl onKeyDown={(e) => _sendMessage(e)} isRequired mt="3">
                 <Input
                   variant="filled"
                   bg="#E0E0E0"

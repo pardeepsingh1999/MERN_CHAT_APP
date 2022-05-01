@@ -5,3 +5,8 @@ export const CLEAR_USER_CREDENTIAL = "CLEAR_USER_CREDENTIAL";
 // loader data actions
 export const SHOW_LOADER = "SHOW_LOADER";
 export const HIDE_LOADER = "HIDE_LOADER";
+
+// notifications actions
+export const ADD_NOTIFICATION = "ADD_NOTIFICATION";
+export const READ_NOTIFICATION = "READ_NOTIFICATION";
+export const CLEAR_NOTIFICATIONS = "CLEAR_NOTIFICATIONS";

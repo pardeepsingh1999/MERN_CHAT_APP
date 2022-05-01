@@ -3,11 +3,16 @@ import hardSet from "redux-persist/es/stateReconciler/hardSet";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import thunk from "redux-thunk";
-import { loaderDataReducer, userCredentialReducer } from "./reducers";
+import {
+  loaderDataReducer,
+  notificationsReducer,
+  userCredentialReducer,
+} from "./reducers";
 
 const rootReducer = combineReducers({
   userCredential: userCredentialReducer,
   loaderData: loaderDataReducer,
+  notifications: notificationsReducer,
 });
 
 const persistConfig = {

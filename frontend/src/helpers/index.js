@@ -10,8 +10,10 @@ import { PostManager } from "../aws/post-manager";
 import { UploadQueueManager } from "../aws/upload-queue-manager";
 import S3BucketUploader from "../aws/s3-bucket-uploader";
 import { clearUserCredential } from "../redux/actions/user-credential";
+import { clearNotifications } from "../redux/actions/notifications";
 
 export const logout = (navigate = null) => {
+  REDUX_STORE.dispatch(clearNotifications());
   REDUX_STORE.dispatch(clearUserCredential());
 
   if (navigate) navigate("/login", { replace: true });

@@ -4,3 +4,20 @@
   overflow-y: scroll;
   scrollbar-width: none;
 }
+
+.notification-menu-list {
+  overflow-x: auto;
+  max-height: 200px;
+}
+
+.notification-menu-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.notification-menu-list::-webkit-scrollbar-track {
+  border-radius: 10px;
+}
+
+.notification-menu-list::-webkit-scrollbar-thumb {
+  border-radius: 24px;
+}

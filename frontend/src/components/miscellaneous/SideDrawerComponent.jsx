@@ -17,9 +17,9 @@ import {
   Text,
   Tooltip,
 } from "@chakra-ui/react";
-import { BellIcon, ChevronDownIcon } from "@chakra-ui/icons";
+import { BellIcon, ChevronDownIcon, DeleteIcon } from "@chakra-ui/icons";
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { DEFAULT_PROFILE_PICTURE } from "../../config/index";
 import { logout, showToast } from "../../helpers/index";
@@ -27,11 +27,21 @@ import { accessChat, getAllUsers } from "../../http/http-calls";
 import ChatLoadingComponent from "./ChatLoadingComponent";
 import UserListItemComponent from "./UserListItemComponent";
 import ProfileModal from "../modals/ProfileModal";
+import { getSenderName } from "../../helpers/chat-helpers";
+import { Effect } from "react-notification-badge";
+import NotificationBadge from "react-notification-badge/lib/components/NotificationBadge";
+import {
+  clearNotifications,
+  readNotification,
+} from "../../redux/actions/notifications";
 
 const SideDrawerComponent = ({ handleSelectChat }) => {
   const navigate = useNavigate();
 
   const userCredential = useSelector((state) => state?.userCredential);
+  const notifications = useSelector((state) => state?.notifications);
+
+  const dispatch = useDispatch();
 
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
@@ -124,9 +134,43 @@ const SideDrawerComponent = ({ handleSelectChat }) => {
 
         <div>
           <Menu>
-            <MenuButton p="1">
+            <MenuButton px="3">
+              <NotificationBadge
+                count={notifications?.length || 0}
+                effect={Effect.SCALE}
+              />
               <BellIcon fontSize="2xl" m="1" />
             </MenuButton>
+            <MenuList className="notification-menu-list">
+              {notifications?.length ? (
+                <>
+                  {notifications.map((each) => (
+                    <MenuItem
+                      key={each._id}
+                      onClick={() => {
+                        dispatch(readNotification(each.chat._id));
+                        handleSelectChat(each.chat);
+                      }}
+                    >
+                      {each.chat.isGroupChat
+                        ? `New Message in ${each.chat.chatName}`
+                        : `New Message from ${getSenderName(each.chat.users)}`}
+                    </MenuItem>
+                  ))}
+                  <MenuItem
+                    icon={<DeleteIcon />}
+                    onClick={() => {
+                      dispatch(clearNotifications());
+                    }}
+                    color="red"
+                  >
+                    Clear all
+                  </MenuItem>
+                </>
+              ) : (
+                <div style={{ paddingLeft: "10px" }}>No New Message</div>
+              )}
+            </MenuList>
           </Menu>
           <Menu>
             <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>

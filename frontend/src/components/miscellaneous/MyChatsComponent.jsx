@@ -89,6 +89,19 @@ const MyChatsComponent = ({
                       ? capitalizeEveryFirstLetter(chat.chatName)
                       : getSenderName(chat.users)}
                   </Text>
+                  {chat.latestMessage ? (
+                    <Text fontSize="xs">
+                      <b>
+                        {capitalizeEveryFirstLetter(
+                          chat.latestMessage.sender.name
+                        )}{" "}
+                        :{" "}
+                      </b>
+                      {chat.latestMessage.content.length > 50
+                        ? chat.latestMessage.content.substring(0, 51) + "..."
+                        : chat.latestMessage.content}
+                    </Text>
+                  ) : null}
                 </Box>
               ))}
             </Stack>

@@ -18,6 +18,17 @@ const ChatPage = () => {
     if (selectedChat?._id !== chat?._id) setSelectedChat(chat);
   };
 
+  const _updateLatestMessage = (latestMessage) => {
+    const newChats = [...chats];
+    const findChat = newChats.find(
+      (each) => each._id === latestMessage.chat._id
+    );
+    if (findChat) {
+      findChat["latestMessage"] = latestMessage;
+      setChats(newChats);
+    }
+  };
+
   const _fetchChats = () => {
     setThreadLoading(true);
 
@@ -77,6 +88,9 @@ const ChatPage = () => {
             selectedChat={selectedChat}
             handleSelectChat={(chat) => _handleSelectChat(chat)}
             fetchChats={() => _fetchChats()}
+            updateLatestMessage={(latestMessage) =>
+              _updateLatestMessage(latestMessage)
+            }
           />
         </Box>
       </div>

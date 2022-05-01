@@ -16,8 +16,7 @@ export const loaderDataReducer = (state = initialState, action) => {
       newState = initialState;
       break;
     }
-    default: {
-    }
+    default:
   }
   return newState;
 };

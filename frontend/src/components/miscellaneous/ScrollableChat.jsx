@@ -8,8 +8,19 @@ import {
   isMyMessage,
 } from "../../helpers/chat-helpers";
 import { formatTime } from "../../helpers/index";
+import Lottie from "react-lottie";
+import typingLoadingAnimationData from "../../assets/animations/typing_loading.json";
 
-const ScrollableChat = ({ messages }) => {
+const ScrollableChat = ({ messages, isTyping }) => {
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: typingLoadingAnimationData,
+    redererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
+
   return (
     <ScrollableFeed>
       {messages &&
@@ -110,6 +121,16 @@ const ScrollableChat = ({ messages }) => {
             </div>
           </React.Fragment>
         ))}
+
+      {isTyping ? (
+        <div>
+          <Lottie
+            options={defaultOptions}
+            width={70}
+            style={{ marginTop: 10, marginLeft: 0 }}
+          />
+        </div>
+      ) : null}
     </ScrollableFeed>
   );
 };
