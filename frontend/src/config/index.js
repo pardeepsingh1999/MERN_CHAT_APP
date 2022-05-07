@@ -1,12 +1,12 @@
 export const BASE_URL =
   process.env.REACT_APP_BACKEND_ENV === "live"
-    ? "/api"
+    ? "https://api-lets-chat.herokuapp.com/api"
     : "http://localhost:5000/api";
 
 export const SOCKET_BASE_URL =
   process.env.REACT_APP_BACKEND_ENV === "live"
-    ? "https://lets-chat.herokuapp.com"
-    : "http://127.0.0.1:5000";
+    ? "https://api-lets-chat.herokuapp.com"
+    : "http://localhost:5000";
 
 export const IP_FETCH_URL = "https://ipapi.co/json/";
 
