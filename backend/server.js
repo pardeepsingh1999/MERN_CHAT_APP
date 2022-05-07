@@ -1,10 +1,10 @@
 const express = require("express");
 const dotenv = require("dotenv");
-const colors = require("colors");
-const path = require("path");
+const colors = require("colors"); // it is used in this file
 var cors = require("cors");
 const { Server } = require("socket.io");
-var http = require("http");
+
+dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 
@@ -14,8 +14,6 @@ const chatRoutes = require("./routes/chatRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 
-dotenv.config();
-
 connectDB();
 
 const app = express();
@@ -23,24 +21,28 @@ const app = express();
 app.use(cors()); // cors
 app.use(express.json()); // to accept json data
 
+app.get("/", (req, res) => {
+  res.send("API is Running Successfully");
+});
+
 app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/message", messageRoutes);
 
 // ------------------------------- Start: Deployment ---------------------------- //
 
-const __dirname1 = path.resolve();
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname1, "/frontend/build")));
+// const __dirname1 = path.resolve();
+// if (process.env.NODE_ENV === "production") {
+//   app.use(express.static(path.join(__dirname1, "/frontend/build")));
 
-  app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname1, "frontend", "build", "index.html"));
-  });
-} else {
-  app.get("/", (req, res) => {
-    res.send("API is Running Successfully");
-  });
-}
+//   app.get("*", (req, res) => {
+//     res.sendFile(path.resolve(__dirname1, "frontend", "build", "index.html"));
+//   });
+// } else {
+//   app.get("/", (req, res) => {
+//     res.send("API is Running Successfully");
+//   });
+// }
 
 // ------------------------------- End: Deployment ---------------------------- //
 
@@ -54,7 +56,6 @@ const server = app.listen(PORT, () => {
 const io = new Server(server, {
   pingTimeout: 60000,
   cors: {
-    // origin: "http://0.0.0.0:3000",
     origin: "*",
     methods: ["GET", "POST"],
     transports: ["websocket", "polling"],
