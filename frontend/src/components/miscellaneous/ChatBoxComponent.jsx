@@ -21,7 +21,10 @@ import {
   newSocket,
 } from "../../socket-io";
 import { useSelector, useDispatch } from "react-redux";
-import { addNotification } from "../../redux/actions/notifications";
+import {
+  addNotification,
+  readNotification,
+} from "../../redux/actions/notifications";
 
 const ChatBoxComponent = ({
   selectedChat,
@@ -84,6 +87,8 @@ const ChatBoxComponent = ({
         newSocket.on("messageReceived", (newMessageReceived) => {
           console.log("newMessageReceived>>", newMessageReceived);
 
+          setIsTyping(false);
+
           updateLatestMessage(newMessageReceived);
 
           if (newMessageReceived.error) {
@@ -97,7 +102,10 @@ const ChatBoxComponent = ({
             return;
           }
 
-          if (newMessageReceived.chat._id === selectedChat._id) {
+          if (
+            selectedChat &&
+            newMessageReceived.chat._id === selectedChat._id
+          ) {
             setMessages((prev) => [...prev, newMessageReceived]);
           } else {
             // give notification
@@ -198,6 +206,35 @@ const ChatBoxComponent = ({
             );
             return;
           }
+
+          newSocket.on("messageReceived", (newMessageReceived) => {
+            console.log("newMessageReceived>>", newMessageReceived);
+
+            setIsTyping(false);
+
+            updateLatestMessage(newMessageReceived);
+
+            if (newMessageReceived.error) {
+              console.log("error>>", newMessageReceived);
+              showToast(
+                newMessageReceived?.reason?.length
+                  ? newMessageReceived.reason
+                  : "Server error. Try again after sometimes.",
+                "error"
+              );
+              return;
+            }
+
+            if (
+              selectedChat &&
+              newMessageReceived.chat._id === selectedChat._id
+            ) {
+              setMessages((prev) => [...prev, newMessageReceived]);
+            } else {
+              // give notification
+              dispatch(addNotification(newMessageReceived));
+            }
+          });
         });
       })
       .catch((error) => {
@@ -231,6 +268,10 @@ const ChatBoxComponent = ({
 
   useEffect(() => {
     if (selectedChat?._id) {
+      setIsTyping(false);
+
+      dispatch(readNotification(selectedChat?._id));
+
       newSocket.removeAllListeners("messageReceived");
       newSocket.removeAllListeners("typing");
       _getAllMessages(selectedChat?._id);
@@ -242,6 +283,28 @@ const ChatBoxComponent = ({
     _connectToSocket();
 
     return () => {
+      newSocket.removeAllListeners("messageReceived");
+      newSocket.removeAllListeners("typing");
+
+      if (userCredential?.user?._id) {
+        newSocket.emit(
+          "unsetup",
+          { room: userCredential?.user?._id },
+          (res) => {
+            if (res.error) {
+              console.log("error>>", res);
+              showToast(
+                res.reason && res.reason.length
+                  ? res.reason
+                  : "Server error. Try again after sometimes.",
+                "error"
+              );
+              return;
+            }
+          }
+        );
+      }
+
       _disconnectToSocket();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -5,6 +5,7 @@ import MyChatsComponent from "../components/miscellaneous/MyChatsComponent";
 import SideDrawerComponent from "../components/miscellaneous/SideDrawerComponent";
 import { showToast } from "../helpers";
 import { fetchChats } from "../http/http-calls";
+import { newSocket } from "../socket-io";
 
 const ChatPage = () => {
   const [selectedChat, setSelectedChat] = useState(null);
@@ -15,17 +16,51 @@ const ChatPage = () => {
     if (chat?._id && !chats.find((each) => each._id === chat._id))
       setChats([chat, ...chats]);
 
-    if (selectedChat?._id !== chat?._id) setSelectedChat(chat);
+    if (selectedChat?._id !== chat?._id) {
+      setSelectedChat((prev) => {
+        if (selectedChat?._id) {
+          newSocket.emit("unjoinChat", selectedChat._id, (res) => {
+            if (res.error) {
+              console.log("error>>", res);
+              showToast(
+                res.reason && res.reason.length
+                  ? res.reason
+                  : "Server error. Try again after sometimes.",
+                "error"
+              );
+              return;
+            }
+          });
+        }
+
+        return chat;
+      });
+    }
   };
 
   const _updateLatestMessage = (latestMessage) => {
-    const newChats = [...chats];
-    const findChat = newChats.find(
-      (each) => each._id === latestMessage.chat._id
-    );
-    if (findChat) {
-      findChat["latestMessage"] = latestMessage;
-      setChats(newChats);
+    try {
+      const newChats = [...chats];
+      const findChatIndex = newChats.findIndex(
+        (each) => each._id === latestMessage.chat._id
+      );
+      console.log("findChatIndex", newChats, latestMessage, findChatIndex);
+      if (findChatIndex > -1) {
+        if (findChatIndex > 0) {
+          const spliceChat = newChats.splice(findChatIndex, 1);
+
+          newChats.unshift(spliceChat[0]);
+        }
+
+        newChats[0]["latestMessage"] = latestMessage;
+
+        setChats(newChats);
+      } else {
+        _fetchChats();
+      }
+    } catch (error) {
+      console.log("error>>", error);
+      _fetchChats();
     }
   };
 

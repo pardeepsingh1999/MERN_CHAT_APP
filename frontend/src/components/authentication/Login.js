@@ -25,7 +25,9 @@ const Login = () => {
 
   const [loading, setLoading] = useState(false);
 
-  const _submitHandler = async () => {
+  const _submitHandler = async (e) => {
+    if (e) e.preventDefault();
+
     if (!email || !password) {
       showToast("Please fill all the fields", "error");
       return;
@@ -75,55 +77,56 @@ const Login = () => {
 
   return (
     <VStack spacing="5px">
-      <FormControl id="email" isRequired>
-        <FormLabel>Email</FormLabel>
-        <Input
-          id="login-email"
-          type="email"
-          placeholder="Enter you email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </FormControl>
-
-      <FormControl id="password" isRequired>
-        <FormLabel>Password</FormLabel>
-        <InputGroup>
+      <form onSubmit={_submitHandler} style={{ width: "100%" }}>
+        <FormControl id="email" isRequired p="1">
+          <FormLabel>Email</FormLabel>
           <Input
-            id="login-password"
-            type={showPassword ? "text" : "password"}
-            placeholder="Enter you password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            id="login-email"
+            type="email"
+            placeholder="Enter you email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
-          <InputRightElement width="4.5rem">
-            <Button
-              h="1.75rem"
-              size="sm"
-              onClick={() => setShowPassword((prev) => !prev)}
-            >
-              {showPassword ? "Hide" : "Show"}
-            </Button>
-          </InputRightElement>
-        </InputGroup>
-      </FormControl>
+        </FormControl>
 
-      <Button
-        colorScheme="blue"
-        width="100%"
-        style={{ marginTop: 15 }}
-        onClick={_submitHandler}
-        isLoading={loading}
-      >
-        Login
-      </Button>
+        <FormControl id="password" isRequired p="1">
+          <FormLabel>Password</FormLabel>
+          <InputGroup>
+            <Input
+              id="login-password"
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter you password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <InputRightElement width="4.5rem">
+              <Button
+                h="1.75rem"
+                size="sm"
+                onClick={() => setShowPassword((prev) => !prev)}
+              >
+                {showPassword ? "Hide" : "Show"}
+              </Button>
+            </InputRightElement>
+          </InputGroup>
+        </FormControl>
+
+        <Button
+          type="submit"
+          colorScheme="blue"
+          width="100%"
+          style={{ margin: "15px 0px 10px" }}
+          isLoading={loading}
+        >
+          Login
+        </Button>
+      </form>
 
       <Button
         variant="solid"
         colorScheme="red"
         width="100%"
         onClick={() => {
-          console.log("work");
           setEmail("guest@gmail.com");
           setPassword("qwerty");
         }}

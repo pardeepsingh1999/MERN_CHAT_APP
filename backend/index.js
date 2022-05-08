@@ -66,6 +66,8 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   socket.on("setup", async (params, fn) => {
     try {
+      console.log("USER CONNECTED", params.room);
+
       await socket.join(params.room);
 
       fn({ error: false, defaultRoom: socket.id });
@@ -83,6 +85,18 @@ io.on("connection", (socket) => {
     try {
       socket.join(room);
       console.log("user joined room: ", room);
+
+      fn({ error: false });
+    } catch (error) {
+      console.log("[error]", "leave room :", error);
+      fn({ error: true, defaultRoom: socket.id });
+    }
+  });
+
+  socket.on("unjoinChat", async (room, fn) => {
+    try {
+      socket.leave(room);
+      console.log("user unjoined room: ", room);
 
       fn({ error: false });
     } catch (error) {
@@ -117,8 +131,15 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.off("setup", () => {
-    console.log("USER DISCONNECTED");
-    socket.leave(userData._id);
+  socket.on("unsetup", (params, fn) => {
+    try {
+      console.log("USER DISCONNECTED", params.room);
+      socket.leave(params.room);
+
+      fn({ error: false });
+    } catch (error) {
+      console.log("[error]", "disconnect room :", error);
+      fn({ error: true, defaultRoom: socket.id });
+    }
   });
 });
