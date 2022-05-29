@@ -25,6 +25,7 @@ import {
   addNotification,
   readNotification,
 } from "../../redux/actions/notifications";
+import { showLoader, hideLoader } from "../../redux/actions/loader-data";
 
 const ChatBoxComponent = ({
   selectedChat,
@@ -193,8 +194,12 @@ const ChatBoxComponent = ({
   }, [typing]);
 
   const _connectToSocket = () => {
+    dispatch(showLoader("Connecting to socket..."));
+
     connectToSocket()
       .then((res) => {
+        dispatch(hideLoader());
+
         newSocket.emit("setup", { room: userCredential?.user?._id }, (res) => {
           if (res.error) {
             console.log("error>>", res);
@@ -239,6 +244,8 @@ const ChatBoxComponent = ({
       })
       .catch((error) => {
         console.log("error>>", error);
+
+        dispatch(hideLoader());
 
         showToast(
           error?.reason?.length

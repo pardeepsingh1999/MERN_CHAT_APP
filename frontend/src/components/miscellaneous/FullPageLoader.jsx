@@ -1,5 +1,5 @@
+import { Spinner } from "@chakra-ui/react";
 import React, { Component } from "react";
-import { Oval } from "react-loader-spinner";
 import { connect } from "react-redux";
 
 class FullPageLoader extends Component {
@@ -28,7 +28,13 @@ class FullPageLoader extends Component {
               textAlign: "center",
             }}
           >
-            <Oval color={"#3498DB"} />
+            <Spinner
+              thickness="4px"
+              speed="0.65s"
+              emptyColor="gray.200"
+              color="blue.500"
+              size="xl"
+            />
             {loaderData && loaderData.loaderText ? (
               <p
                 style={{
